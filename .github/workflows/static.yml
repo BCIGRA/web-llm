@@ -13,7 +13,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Configuring build Environment
+    - name: Configuring build environment
       run: |
         sudo apt-get update
         python -m pip install -U pip
@@ -36,11 +36,26 @@ jobs:
         git config --global user.name "mlc-gh-actions-bot"
         git remote set-url origin https://x-access-token:${{ secrets.MLC_GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
 
-        # Build Jekyll dan salin dokumen
+        # Build dokumentasi
+        if [ -f docs/Makefile ]; then
+          cd docs
+          make html
+          cd ..
+        else
+          echo "Error: Makefile not found in docs directory."
+          exit 1
+        fi
+
+        # Build Jekyll dan salin hasil build
         jekyll b -s site -d _site
-        rm -rf _site/docs
-        mkdir -p _site/docs
-        cp -r docs/_build/html/* _site/docs
+        if [ -d docs/_build/html ]; then
+          rm -rf _site/docs
+          mkdir -p _site/docs
+          cp -r docs/_build/html/* _site/docs
+        else
+          echo "Error: Build directory 'docs/_build/html' not found."
+          exit 1
+        fi
         touch _site/.nojekyll
         echo "webllm.mlc.ai" > _site/CNAME
 
