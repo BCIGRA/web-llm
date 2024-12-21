@@ -3,35 +3,37 @@ short_name: "WebLLM"
 
 url: https://webllm.mlc.ai
 
-exclude: [README.md, serve_local.sh]
+exclude:
+  - README.md
+  - serve_local.sh
 
 plugins:
   - jekyll-remote-theme
 
 remote_theme: mlc-ai/jekyll-theme-mlc
 
-# Colorize code snippets with the rogue module if we want to deploy on GH.
+# Gunakan 'rouge' untuk mewarnai kode jika kita ingin deploy di GitHub Pages.
 highlighter: rouge
 
 markdown: kramdown
 
-# The path structure for blog posts.
+# Struktur path untuk blog posts.
 permalink: /blog/:year/:month/:day/:title.html
 
-# Number of news stories on the front page.
+# Jumlah berita di halaman utama.
 front_page_news: 8
 
-# Base pathname for links.
+# Base pathname untuk links.
 base: ""
 
-# make pages for the _projects folder
+# Membuat halaman untuk folder _projects
 collections:
   projects:
     output: true
 
-course_title:
+course_title: "Your Course Title Here" # Ganti dengan judul kursus yang sesuai
 
-# Navigation bar links.
+# Link pada navbar.
 navigation:
   - title: Home
     link: /
