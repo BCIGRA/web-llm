@@ -34,5 +34,18 @@ jobs:
         git remote set-url origin https://x-access-token:${{ secrets.MLC_GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
         git config --global user.email "mlc-gh-actions-bot@nomail"
         git config --global user.name "mlc-gh-actions-bot"
+        
+        git fetch origin
+        
+        # Cek apakah branch gh-pages sudah ada
+        if git rev-parse --verify origin/gh-pages >/dev/null 2>&1; then
+          git checkout gh-pages
+        else
+          git checkout --orphan gh-pages
+          git reset --hard
+          git commit --allow-empty -m "Initialize gh-pages branch"
+          git push origin gh-pages
+        fi
 
+        # Jalankan script untuk deploy
         ./scripts/gh_deploy_site.sh
