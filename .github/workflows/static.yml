@@ -31,21 +31,28 @@ jobs:
     - name: Build and deploy site
       if: github.ref == 'refs/heads/main'
       run: |
-        git remote set-url origin https://x-access-token:${{ secrets.MLC_GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
+        # Konfigurasi Git
         git config --global user.email "mlc-gh-actions-bot@nomail"
         git config --global user.name "mlc-gh-actions-bot"
-        
-        git fetch origin
-        
-        # Cek apakah branch gh-pages sudah ada
-        if git rev-parse --verify origin/gh-pages >/dev/null 2>&1; then
-          git checkout gh-pages
-        else
-          git checkout --orphan gh-pages
-          git reset --hard
-          git commit --allow-empty -m "Initialize gh-pages branch"
-          git push origin gh-pages
-        fi
+        git remote set-url origin https://x-access-token:${{ secrets.MLC_GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
 
-        # Jalankan script untuk deploy
-        ./scripts/gh_deploy_site.sh
+        # Build Jekyll dan salin dokumen
+        jekyll b -s site -d _site
+        rm -rf _site/docs
+        mkdir -p _site/docs
+        cp -r docs/_build/html/* _site/docs
+        touch _site/.nojekyll
+        echo "webllm.mlc.ai" > _site/CNAME
+
+        # Deploy ke branch gh-pages
+        git fetch origin
+        git switch --create gh-pages || git switch gh-pages
+        rm -rf ./*
+        cp -r _site/* .
+        git add .
+        git commit -m "Deploy site on $(date)"
+        git push --force origin gh-pages
+
+    - name: Cleanup
+      if: always()
+      run: git switch main
